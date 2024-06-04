@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ID Photo Upload</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+
+        #upload-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        progress {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .box {
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            background-color: #f9f9f9;
+            margin-bottom: 20px;
+        }
+
+        .upload-photo {
+            width: 300px;
+        }
+
+        .upload-form {
+            overflow: hidden;
+            margin-left: 20px;
+        }
+
+        .upload-form p {
+            margin: 0;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .report-issue-link {
+            align-self: flex-end;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        #captured-photo {
+            max-width: 100%;
+            margin-top: 20px;
+            /* Add some space between the capture button and the captured photo */
+        }
+
+        #file-upload,
+        .styled-button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #file-upload:hover,
+        .styled-button:hover {
+            background-color: #0056b3;
+        }
+
+        #file-upload {
+            display: none;
+        }
+
+        .custom-file-upload {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-align: center;
+        }
+
+        .custom-file-upload:hover {
+            background-color: #0056b3;
+        }
+
+        .center {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        #photo-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        #photo-container video {
+            max-width: 100%;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+
+        #photo-container button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #28a745;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #photo-container button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="upload-container">
+        <progress value="1" max="3"></progress><span> 1/3</span>
+        <p>Estimated time to complete: 5 min.</p>
+        <h2>Upload Your ID Photo</h2>
+        <div class="box">
+            <img src="assets/img/uploadPhoto.jpg" alt="Upload Photo" class="upload-photo">
+            <div class="upload-form">
+                <p>Make sure ID is in horizontal position!</p>
+                <p>If not, adjust it with</p>
+                <button class="styled-button" onclick="rotateImage()">Rotate Image</button>
+                <div class="report-issue-link">
+                    <p><a href="#" onclick="reportCameraIssues()">Report issues with camera</a></p>
+                </div>
+            </div>
+        </div>
+        <div class="center">
+            <label for="file-upload" class="custom-file-upload">
+                Choose File
+            </label>
+            <input type="file" id="file-upload" accept="image/*" onchange="handleFileSelect(event)">
+            <button class="styled-button" onclick="capturePhoto()">Capture Photo</button>
+        </div>
+        <div id="photo-container"></div>
+    </div>
+
+    <script>
+        let capturedImage = null;
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                const img = document.getElementById('captured-photo');
+                if (!img) {
+                    const newImg = new Image();
+                    newImg.id = 'captured-photo';
+                    newImg.src = event.target.result;
+                    document.getElementById('photo-container').appendChild(newImg);
+                } else {
+                    img.src = event.target.result;
+                }
+                capturedImage = img ? img.src : event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function rotateImage() {
+            if (capturedImage) {
+                const img = document.getElementById('captured-photo');
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = img.height;
+                canvas.height = img.width;
+                ctx.translate(canvas.width / 2, canvas.height / 2);
+                ctx.rotate(Math.PI / 2);
+                ctx.drawImage(img, -img.width / 2, -img.height / 2);
+                img.src = canvas.toDataURL();
+            }
+        }
+
+        function capturePhoto() {
+            const video = document.createElement('video');
+            const photoContainer = document.getElementById('photo-container');
+
+            // Use getUserMedia API to access the device camera
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function (stream) {
+                    video.srcObject = stream;
+                    video.play();
+                    photoContainer.appendChild(video);
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    const context = canvas.getContext('2d');
+
+                    // Capture photo when user clicks the button
+                    const captureButton = document.createElement('button');
+                    captureButton.textContent = 'Take Photo';
+                    captureButton.onclick = function () {
+                        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                        const imageDataURL = canvas.toDataURL('image/png');
+
+                        // Cleanup
+                        video.srcObject.getTracks().forEach(track => track.stop());
+                        photoContainer.removeChild(video);
+                        photoContainer.removeChild(captureButton);
+
+                        // Show the captured photo
+                        const img = new Image();
+                        img.src = imageDataURL;
+                        img.id = 'captured-photo';
+                        photoContainer.innerHTML = ''; // Clear previous content
+                        photoContainer.appendChild(img); // Add the captured image to the container
+
+                        // Store the photo in the capturedImage variable
+                        capturedImage = imageDataURL;
+                    };
+                    photoContainer.appendChild(captureButton);
+                })
+                .catch(function (err) {
+                    console.error('Error accessing the camera: ', err);
+                });
+        }
+
+        function reportCameraIssues() {
+            // Function to report camera issues
+        }
+    </script>
+</body>
+
+</html>

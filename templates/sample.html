@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Your ID Photo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f5f5f5;
+            margin: 0;
+        }
+
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 566px;
+            width: 100%;
+        }
+
+        .progress-bar {
+            height: 5px;
+            background-color: #007bff;
+            border-radius: 3px;
+            width: 30%;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        .id-card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            margin-bottom: 15px;
+            max-width: 500px;
+            height: 300px;
+        }
+
+        .id-card .image-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .id-card img,
+        .id-card video {
+            max-width: 100%;
+            max-height: 100%;
+            display: block;
+            margin: auto;
+            /* Center the image */
+        }
+
+        .capture-btn {
+            margin-top: auto;
+            width: 100%;
+            background-color: #28a745;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            padding: 10px 15px;
+        }
+
+        .rotate-image-overlay {
+            position: absolute;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .rotate-image-overlay.hide {
+            display: none;
+        }
+
+        /* Adjustments for the video element */
+        #videoPreview {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            /* Ensure the video fills the container */
+        }
+
+        .instructions {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 15px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .rotate-image {
+            display: flex;
+            align-items: center;
+            margin-left: 10px;
+        }
+
+        .rotate-image img {
+            cursor: pointer;
+            width: 50px;
+        }
+
+        .rotate-image span {
+            margin-left: 10px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .buttons {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .buttons button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .report-btn-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .report-btn {
+            background-color: #800080;
+            text-decoration: none;
+            display: inline-block;
+            padding: 10px 15px;
+            border-radius: 5px;
+            color: white;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .file-btn,
+        .capture-btn,
+        #captureImageButton {
+            background-color: #28a745;
+            width: 48%;
+        }
+
+        .or-text {
+            margin: 0 10px;
+            font-size: 1em;
+            color: red;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .hidden-input {
+            display: none;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 400px;
+        }
+
+        .modal-header,
+        .modal-body,
+        .modal-footer {
+            padding: 10px;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .modal-footer {
+            border-top: 1px solid #e5e5e5;
+            text-align: right;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        #rotateOverlay {
+            width: 50px;
+            height: 50px;
+            margin-left: 20px;
+        }
+
+        #captureImageButton {
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        .next-btn {
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            padding: 10px 15px;
+            display: none;
+            text-align: center;
+            align-self: flex-end;
+            width: 48%;
+        }
+
+        .next-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="progress-bar"></div>
+        <h1>1/3</h1>
+        <p>Estimated time to complete: 5 min.</p>
+        <h1>Upload Your ID Photo</h1>
+        <div class="id-card">
+            <div class="image-container">
+                <img id="idPreview" src="/static/assets/img/uploadPhoto.jpg" alt="ID Card Preview" class="centered-image">
+                <video id="videoPreview" autoplay muted></video>
+            </div>
+            <button id="captureImageButton" class="capture-btn">Capture Image</button>
+            <img id="rotateOverlay" src="/static/assets/img/rotateImage2.jpg" alt="Rotate Image"
+                class="rotate-image-overlay hide" width="50" height="50">
+        </div>
+
+        <div class="instructions">
+            Make sure ID is in horizontal position!
+            <br>
+            If not, adjust it with
+            <div class="rotate-image">
+                <img src="/static/assets/img/rotateImage.jpg" alt="Rotate Image" id="rotateImage2">
+                <span>Rotate Icon</span>
+            </div>
+        </div>
+        <div class="report-btn-container">
+            <a href="#" class="report-btn" id="reportBtn">Report issues with camera</a>
+        </div>
+        <div class="buttons">
+            <button class="file-btn" id="fileButton">Choose File</button>
+            <input type="file" id="fileInput" class="hidden-input">
+            <span class="or-text">OR</span>
+            <button class="capture-btn" id="enableCameraButton">Enable Camera</button>
+            <button class="next-btn" id="nextButton">Next</button>
+        </div>
+    </div>
+
+    <!-- The Modal -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close">&times;</span>
+                <h2>Report Issue</h2>
+            </div>
+            <div class="modal-body">
+                <form id="reportForm">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" required><br><br>
+                    <label for="note">Description:</label>
+                    <textarea id="note" name="note" rows="4" required></textarea><br><br>
+                    <button type="submit" id="submitReportBtn">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    
+    <script>
+        // Get the modal
+        var modal = document.getElementById("myModal");
+
+        // Get the button that opens the modal
+        var btn = document.getElementById("reportBtn");
+
+        // Get the <span> element that closes the modal
+        var span = document.getElementsByClassName("close")[0];
+
+        // When the user clicks the button, open the modal
+        btn.onclick = function () {
+            modal.style.display = "flex";
+        }
+
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function () {
+            modal.style.display = "none";
+        }
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function (event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        // Function to show rotateImageOverlay
+        function showRotateOverlay() {
+            var rotateOverlay = document.getElementById('rotateOverlay');
+            rotateOverlay.classList.remove('hide');
+        }
+
+        // Function to hide rotateImageOverlay
+        function hideRotateOverlay() {
+            var rotateOverlay = document.getElementById('rotateOverlay');
+            rotateOverlay.classList.add('hide');
+        }
+
+        var fileButton = document.getElementById('fileButton');
+        var fileInput = document.getElementById('fileInput');
+        var idPreview = document.getElementById('idPreview');
+        var video = document.getElementById('videoPreview');
+
+        fileButton.onclick = function () {
+            fileInput.click();
+        }
+
+        fileInput.onchange = function (event) {
+            var file = event.target.files[0];
+            if (file) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    idPreview.src = e.target.result;
+                    idPreview.style.display = 'block';
+                    video.style.display = 'none';
+                    showRotateOverlay();
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Function to rotate the preview image by 90 degrees
+        function rotatePreviewImage() {
+            var idPreview = document.getElementById('idPreview');
+            var currentRotation = parseInt(idPreview.dataset.rotation) || 0;
+            var newRotation = (currentRotation + 90) % 360;
+            idPreview.style.transform = 'translate(-50%, -50%) rotate(' + newRotation + 'deg)';
+            idPreview.dataset.rotation = newRotation;
+        }
+
+        // Get the rotateImage element
+        var rotateImage = document.getElementById('rotateImage2');
+
+        // When the user clicks on the rotateImage overlay, rotate the preview image
+        rotateImage.addEventListener('click', function () {
+            rotatePreviewImage();
+        });
+
+        // Capture photo functionality
+        var enableCameraButton = document.getElementById('enableCameraButton');
+        var captureImageButton = document.getElementById('captureImageButton');
+        var canvas = document.createElement('canvas');
+        var context = canvas.getContext('2d');
+
+        function enableCamera() {
+            console.log("Enabling camera...");
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function (stream) {
+                    console.log("Camera enabled");
+                    video.srcObject = stream;
+                    video.style.display = 'block';
+                    idPreview.style.display = 'none';
+                    hideRotateOverlay();
+                    captureImageButton.classList.remove('hide');
+                })
+                .catch(function (err) {
+                    console.error("Error accessing the camera: ", err);
+                });
+        }
+
+        enableCameraButton.onclick = function () {
+            enableCamera();
+        }
+
+        captureImageButton.onclick = function () {
+            console.log("Capturing image...");
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            var dataURL = canvas.toDataURL('image/png');
+            idPreview.src = dataURL;
+            idPreview.style.display = 'block';
+            video.style.display = 'none';
+            showRotateOverlay();
+
+            // Stop the camera stream
+            var stream = video.srcObject;
+            var tracks = stream.getTracks();
+            tracks.forEach(function (track) {
+                track.stop();
+            });
+            video.srcObject = null;
+            captureImageButton.classList.add('hide');
+        }
+
+
+
+
+    </script>
+
+    <script>
+        $("#submitReportBtn").click(function (e) {
+            e.preventDefault();
+
+            let formData = {
+                username: $("#username").val(),
+                note: $("#note").val()
+            }
+
+            $.ajax({
+                url: '/report/addreport',
+                method: 'POST',
+                data: formData,
+                success: function (response) {
+                    // let success = response.success
+
+                    // console.log(success)
+                    alert(response);
+                    $(".modal .close").click();
+                },
+                error: function (err) {
+                    console.error("Error submitting report:", err);
+                }
+            })
+        });
+
+        $(document).ready(function () {
+            $("#captureImageButton").hide();
+            $("#nextButton").hide();
+            $("#enableCameraButton").click(function () {
+                $("#enableCameraButton").hide();
+                $("#fileButton").hide();
+                $(".or-text").hide();
+                $("#captureImageButton").show();
+            });
+            $("#fileButton").click(function () {
+                $("#enableCameraButton").hide();
+                $("#fileButton").hide();
+                $(".or-text").hide();
+                $("#captureImageButton").hide();
+                $("#nextButton").show();
+            });
+            // $("#fileInput").change(function () {
+            //     if (!this.value) {
+            //         $("#enableCameraButton").show();
+            //         $("#fileButton").show();
+            //         $(".or-text").show();
+            //         $("#captureImageButton").hide();
+            //     }
+            // });
+            $("#captureImageButton").click(function () {
+                $("#nextButton").show();
+                $("#captureImageButton").hide();
+            });
+        });
+    </script>
+
+
+</body>
+
+</html>

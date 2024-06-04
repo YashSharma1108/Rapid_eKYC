@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background: linear-gradient(to bottom, #0ea2bd 50%, white 50%);
+        }
+        .content {
+            text-align: center;
+            margin-top: 100px; /* Adjust this value as needed */
+        }
+        .blue {
+            font-size: 50px; /* Adjust the font size as needed */
+            margin: 10px 0; /* Adjust the margin as needed */
+            color: white;
+        }
+        .white {
+            font-size: 30px;
+            display: none; /* Initially hide all white divs */
+        }
+        .white.active {
+            display: block; /* Display the active white div */
+        }
+        #nextButton {
+            margin-top: 20px;
+            padding: 8px 23px; /* Match the padding */
+            font-size: 16px; /* Match the font size */
+            color: white; /* Match the color */
+            background: #0ea2bd; /* Match the background color */
+            border: none; /* Remove border */
+            border-radius: 4px; /* Match the border radius */
+            cursor: pointer;
+            transition: 0.3s; /* Add transition effect */
+            font-family: Arial, sans-serif; /* Match the font family */
+        }
+        #nextButton:hover {
+            background: #0b7a8d; /* Darken the background color on hover */
+        }
+        .rectangle {
+            width: 50px;
+            height: 30px;
+            background-color: #ccc; /* Initial color */
+            margin: 10px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <div class="blue">
+            <p>What will you need</p>
+            <br>
+            <p>Estimated Time : 5 min</p>
+            <br>
+        </div>
+        <div class="white active">        
+            <p><b>ID photo</b></p>
+            <p>Take a photo of your ID(Aadhar card)</p>
+            <p>with your information visible </p>
+        </div>
+        <div class="white">        
+            <p><b>Type in your information</b></p>
+            <p>Fill out a form with details that match the</p>
+            <p>information on your ID</p>
+        </div>
+        <div class="white">        
+            <p><b>Identity confirmation</b></p>
+            <p>Follow these steps on the screen to confirm</p>
+            <p>your identity</p>
+        </div>
+        <!-- Rectangle boxes -->
+        <div class="rectangle" id="rectangle1"></div>
+        <div class="rectangle" id="rectangle2"></div>
+        <div class="rectangle" id="rectangle3"></div>
+        <br>
+        <button id="nextButton">Next</button>
+    </div>
+
+    <script>
+        var currentIndex = 0; // Current index of the text array
+
+        // Function to show/hide white divs based on currentIndex
+        function showContent() {
+            var whiteDivs = document.querySelectorAll('.white');
+            whiteDivs.forEach(function(div, index) {
+                if (index === currentIndex) {
+                    div.classList.add('active');
+                } else {
+                    div.classList.remove('active');
+                }
+            });
+        }
+
+        // Function to change rectangle colors
+        function changeRectangleColor() {
+            var rectangles = document.querySelectorAll('.rectangle');
+            rectangles.forEach(function(rectangle, index) {
+                if (index === currentIndex) {
+                    rectangle.style.backgroundColor = '#0ea2bd'; // Set color to #0ea2bd for current index
+                } else {
+                    rectangle.style.backgroundColor = '#ccc'; // Set color to #ccc for other indices
+                }
+            });
+        }
+
+        // Initial content display
+        showContent();
+        // Change rectangle colors based on initial index
+        changeRectangleColor();
+
+        // Event listener for the Next button
+        document.getElementById("nextButton").addEventListener("click", function() {
+            // Increment currentIndex
+            currentIndex++;
+            // If currentIndex exceeds the number of white divs, redirect to step2.html
+            if (currentIndex >= document.querySelectorAll('.white').length) {
+                window.location.href = 'step2';
+            } else {
+                // Show content corresponding to currentIndex
+                showContent();
+                // Change rectangle colors
+                changeRectangleColor();
+            }
+        });
+    </script>
+</body>
+</html>
