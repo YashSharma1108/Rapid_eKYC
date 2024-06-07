@@ -378,6 +378,16 @@
             }
         }
 
+         // Function to redirect to step4.html
+         function redirectToStep4() {
+            window.location.href = "/step4";
+        }
+
+        // Event listener for the Next button
+        document.getElementById("nextButton").addEventListener("click", function () {
+            redirectToStep4();
+        });
+
         // Function to show rotateImageOverlay
         function showRotateOverlay() {
             var rotateOverlay = document.getElementById('rotateOverlay');
@@ -489,21 +499,25 @@
             let formData = {
                 username: $("#username").val(),
                 note: $("#note").val()
-            }
+            };
 
             $.ajax({
                 url: '/report/addreport',
                 method: 'POST',
                 data: formData,
                 success: function (response) {
-                    alert(response);
+                    alert(response.message);
                     $(".modal .close").click();
+                    $("#note").val('');
+                    $("#username").val('');
                 },
                 error: function (err) {
                     console.error("Error submitting report:", err);
+                    alert("Error submitting report. Please try again.");
                 }
-            })
+            });
         });
+
 
         // Show/hide buttons based on user interaction
         $(document).ready(function () {
@@ -541,7 +555,7 @@
                         data: { capturedImage: capturedImage },
                         success: function (response) {
                             alert("Image saved successfully!");
-                            console.log("Captured Image:",capturedImage);   //just for checking image in console
+                            console.log("Captured Image:", capturedImage);   //just for checking image in console
                             console.log("Server Response:", response);
                         },
                         error: function (err) {
