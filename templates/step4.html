@@ -81,15 +81,6 @@
             padding: 10px 15px;
         }
 
-        .rotate-image-overlay {
-            position: absolute;
-            top: 50%;
-            right: 15px;
-            transform: translateY(-50%);
-            cursor: pointer;
-            z-index: 2;
-        }
-
         .refresh-container {
             position: absolute;
             top: 70%;
@@ -108,11 +99,6 @@
             color: black;
         }
 
-        .rotate-image-overlay.hide {
-            display: none;
-        }
-
-        /* Adjustments for the video element */
         #videoPreview {
             position: absolute;
             top: 0;
@@ -120,34 +106,6 @@
             width: 79%;
             height: 100%;
             object-fit: cover;
-        }
-
-        .instructions {
-            font-size: 0.9em;
-            color: #666;
-            margin-bottom: 15px;
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .rotate-image {
-            display: flex;
-            align-items: center;
-            margin-left: 10px;
-        }
-
-        .rotate-image img {
-            cursor: pointer;
-            width: 50px;
-        }
-
-        .rotate-image span {
-            margin-left: 10px;
-            font-size: 0.9em;
-            color: #666;
         }
 
         .buttons {
@@ -181,23 +139,10 @@
             cursor: pointer;
         }
 
-        .file-btn,
         .capture-btn,
         #captureImageButton {
             background-color: #28a745;
-            width: 48%;
-        }
-
-        .or-text {
-            margin: 0 10px;
-            font-size: 1em;
-            color: red;
-            text-align: center;
-            font-weight: bold;
-        }
-
-        .hidden-input {
-            display: none;
+            width: 100%;
         }
 
         /* Modal styles */
@@ -254,12 +199,6 @@
             cursor: pointer;
         }
 
-        #rotateOverlay {
-            width: 50px;
-            height: 50px;
-            margin-left: 20px;
-        }
-
         #captureImageButton {
             margin-top: 10px;
             width: 100%;
@@ -301,30 +240,16 @@
                 <video id="videoPreview" autoplay muted></video>
             </div>
             <button id="captureImageButton" class="capture-btn">Capture Image</button>
-            <img id="rotateOverlay" src="/static/assets/img/rotateImage2.jpg" alt="Rotate Image"
-                class="rotate-image-overlay hide" width="50" height="50">
             <div class="refresh-container">
                 <img id="refreshImage" src="/static/assets/img/refresh.jpg" class="refresh-btn" width="30" height="30">
                 <span id="refreshText">Refresh</span>
             </div>
         </div>
 
-        <div class="instructions">
-            Make sure ID is in horizontal position!
-            <br>
-            If not, adjust it with
-            <div class="rotate-image">
-                <img src="/static/assets/img/rotateImage.jpg" alt="Rotate Image" id="rotateImage2">
-                <span>Rotate Icon</span>
-            </div>
-        </div>
         <div class="report-btn-container">
             <a href="#" class="report-btn" id="reportBtn">Report issues with camera</a>
         </div>
         <div class="buttons">
-            <button class="file-btn" id="fileButton">Choose File</button>
-            <input type="file" id="fileInput" class="hidden-input">
-            <span class="or-text">OR</span>
             <button class="capture-btn" id="enableCameraButton">Enable Camera</button>
             <button class="next-btn align-right" id="nextButton">Next</button>
         </div>
@@ -378,69 +303,9 @@
             }
         }
 
-         // Function to redirect to step4.html
-         function redirectToStep4() {
-            window.location.href = "/step4";
-        }
-
-        // Event listener for the Next button
-        document.getElementById("nextButton").addEventListener("click", function () {
-            redirectToStep4();
-        });
-
-        // Function to show rotateImageOverlay
-        function showRotateOverlay() {
-            var rotateOverlay = document.getElementById('rotateOverlay');
-            rotateOverlay.classList.remove('hide');
-        }
-
-        // Function to hide rotateImageOverlay
-        function hideRotateOverlay() {
-            var rotateOverlay = document.getElementById('rotateOverlay');
-            rotateOverlay.classList.add('hide');
-        }
-
-        var fileButton = document.getElementById('fileButton');
-        var fileInput = document.getElementById('fileInput');
         var idPreview = document.getElementById('idPreview');
         var video = document.getElementById('videoPreview');
         var capturedImage = null; // Variable to hold captured image data
-
-        fileButton.onclick = function () {
-            fileInput.click();
-        }
-
-        fileInput.onchange = function (event) {
-            var file = event.target.files[0];
-            if (file) {
-                var reader = new FileReader();
-                reader.onload = function (e) {
-                    idPreview.src = e.target.result;
-                    idPreview.style.display = 'block';
-                    video.style.display = 'none';
-                    capturedImage = e.target.result; // Save the captured image data
-                    showRotateOverlay();
-                }
-                reader.readAsDataURL(file);
-            }
-        }
-
-        // Function to rotate the preview image by 90 degrees
-        function rotatePreviewImage() {
-            var idPreview = document.getElementById('idPreview');
-            var currentRotation = parseInt(idPreview.dataset.rotation) || 0;
-            var newRotation = (currentRotation + 90) % 360;
-            idPreview.style.transform = 'rotate(' + newRotation + 'deg)';
-            idPreview.dataset.rotation = newRotation;
-        }
-
-        // Get the rotateImage element
-        var rotateImage = document.getElementById('rotateOverlay');
-
-        // When the user clicks on the rotateImage overlay, rotate the preview image
-        rotateImage.addEventListener('click', function () {
-            rotatePreviewImage();
-        });
 
         // Capture photo functionality
         var enableCameraButton = document.getElementById('enableCameraButton');
@@ -448,124 +313,47 @@
         var canvas = document.createElement('canvas');
         var context = canvas.getContext('2d');
 
-        function enableCamera() {
-            navigator.mediaDevices.getUserMedia({ video: true })
-                .then(function (stream) {
-                    video.srcObject = stream;
-                    video.style.display = 'block';
-                    idPreview.style.display = 'none';
-                    hideRotateOverlay();
-                    captureImageButton.classList.remove('hide');
-                })
-                .catch(function (err) {
-                    console.error("Error accessing the camera: ", err);
-                });
-        }
+        enableCameraButton.addEventListener('click', async () => {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+                enableCameraButton.style.display = 'none';
+                video.style.display = 'block';
+                captureImageButton.style.display = 'inline-block';
+            } catch (err) {
+                console.error('Error accessing the camera: ', err);
+            }
+        });
 
-        enableCameraButton.onclick = function () {
-            enableCamera();
-        }
-
-        captureImageButton.onclick = function () {
+        captureImageButton.addEventListener('click', () => {
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
-            var dataURL = canvas.toDataURL('image/png');
-            idPreview.src = dataURL;
-            idPreview.style.display = 'block';
+            capturedImage = canvas.toDataURL('image/jpeg');
+            idPreview.src = capturedImage;
             video.style.display = 'none';
-            capturedImage = dataURL; // Save the captured image data
-            showRotateOverlay();
-
-            // Stop the camera stream
-            var stream = video.srcObject;
-            var tracks = stream.getTracks();
-            tracks.forEach(function (track) {
-                track.stop();
-            });
-            video.srcObject = null;
-            captureImageButton.classList.add('hide');
-        }
-
-        // Refresh the page when the refresh image is clicked
-        document.getElementById('refreshImage').addEventListener('click', function () {
-            location.reload();
+            captureImageButton.style.display = 'none';
+            enableCameraButton.style.display = 'inline-block';
+            document.getElementById('nextButton').style.display = 'block';
         });
 
-        // Handle form submission for reporting issues
-        $("#submitReportBtn").click(function (e) {
-            e.preventDefault();
-
-            let formData = {
-                username: $("#username").val(),
-                note: $("#note").val()
-            };
-
-            $.ajax({
-                url: '/report/addreport',
-                method: 'POST',
-                data: formData,
-                success: function (response) {
-                    alert(response.message);
-                    $(".modal .close").click();
-                    $("#note").val('');
-                    $("#username").val('');
-                },
-                error: function (err) {
-                    console.error("Error submitting report:", err);
-                    alert("Error submitting report. Please try again.");
-                }
-            });
+        // Refresh functionality
+        var refreshButton = document.getElementById('refreshImage');
+        refreshButton.addEventListener('click', () => {
+            idPreview.src = '/static/assets/img/uploadPhoto.jpg';
+            capturedImage = null;
+            video.style.display = 'none';
+            captureImageButton.style.display = 'none';
+            enableCameraButton.style.display = 'inline-block';
+            document.getElementById('nextButton').style.display = 'none';
         });
 
-
-        // Show/hide buttons based on user interaction
-        $(document).ready(function () {
-            $("#captureImageButton").hide();
-            $("#nextButton").hide();
-            $("#refreshImage").hide();
-            $("#refreshText").hide();
-            $("#enableCameraButton").click(function () {
-                $("#enableCameraButton").hide();
-                $("#fileButton").hide();
-                $(".or-text").hide();
-                $("#captureImageButton").show();
-                $("#refreshImage").show();
-                $("#refreshText").show();
-            });
-            $("#fileButton").click(function () {
-                $("#enableCameraButton").hide();
-                $("#fileButton").hide();
-                $(".or-text").hide();
-                $("#captureImageButton").hide();
-                $("#nextButton").show();
-                $("#refreshImage").show();
-                $("#refreshText").show();
-            });
-            $("#captureImageButton").click(function () {
-                $("#nextButton").show();
-                $("#captureImageButton").hide();
-            });
-            $("#nextButton").click(function () {
-                if (capturedImage) {
-                    // Send the captured image to the server
-                    $.ajax({
-                        url: '/fetchData',
-                        method: 'POST',
-                        data: { capturedImage: capturedImage },
-                        success: function (response) {
-                            alert("Image saved successfully!");
-                            console.log("Captured Image:", capturedImage);   //just for checking image in console
-                            console.log("Server Response:", response);
-                        },
-                        error: function (err) {
-                            console.error("Error sending image:", err);
-                        }
-                    });
-                } else {
-                    alert("Please capture or select an image first!");
-                }
-            });
+        // Form submission handling
+        $('#reportForm').on('submit', function (event) {
+            event.preventDefault();
+            // Implement form submission logic here (e.g., send data to server)
+            alert('Report submitted.'); // Placeholder alert
+            modal.style.display = "none"; // Close the modal after submission
         });
     </script>
 </body>
