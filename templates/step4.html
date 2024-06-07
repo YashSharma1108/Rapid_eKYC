@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Your ID Photo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f5f5f5;
+            margin: 0;
+        }
+
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 566px;
+            width: 100%;
+        }
+
+        .progress-bar {
+            height: 5px;
+            background-color: #007bff;
+            border-radius: 3px;
+            width: 30%;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        .id-card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            margin-bottom: 15px;
+            max-width: 500px;
+            height: 300px;
+        }
+
+        .id-card .image-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .id-card img,
+        .id-card video {
+            max-width: 65%;
+            max-height: 100%;
+            display: block;
+            margin: auto;
+        }
+
+        .capture-btn {
+            margin-top: auto;
+            width: 100%;
+            background-color: #28a745;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            padding: 10px 15px;
+        }
+
+        .refresh-container {
+            position: absolute;
+            top: 70%;
+            right: 15px;
+            transform: translateY(-50%);
+            cursor: pointer;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .refresh-container span {
+            margin-top: 5px;
+            font-size: 0.9em;
+            color: black;
+        }
+
+        #videoPreview {
+            position: absolute;
+            top: 0;
+            left: 67px;
+            width: 79%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .buttons {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .buttons button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .report-btn-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .report-btn {
+            background-color: #800080;
+            text-decoration: none;
+            display: inline-block;
+            padding: 10px 15px;
+            border-radius: 5px;
+            color: white;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .capture-btn,
+        #captureImageButton {
+            background-color: #28a745;
+            width: 100%;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 400px;
+        }
+
+        .modal-header,
+        .modal-body,
+        .modal-footer {
+            padding: 10px;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .modal-footer {
+            border-top: 1px solid #e5e5e5;
+            text-align: right;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        #captureImageButton {
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        .next-btn {
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            padding: 10px 15px;
+            display: none;
+            text-align: center;
+            align-self: flex-end;
+            width: 30%;
+        }
+
+        .next-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .next-btn.align-right {
+            align-self: flex-end;
+            margin-left: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="progress-bar"></div>
+        <h1>1/3</h1>
+        <p>Estimated time to complete: 5 min.</p>
+        <h1>Upload Your ID Photo</h1>
+        <div class="id-card">
+            <div class="image-container">
+                <img id="idPreview" src="/static/assets/img/uploadPhoto.jpg" alt="ID Card Preview">
+                <video id="videoPreview" autoplay muted></video>
+            </div>
+            <button id="captureImageButton" class="capture-btn">Capture Image</button>
+            <div class="refresh-container">
+                <img id="refreshImage" src="/static/assets/img/refresh.jpg" class="refresh-btn" width="30" height="30">
+                <span id="refreshText">Refresh</span>
+            </div>
+        </div>
+
+        <div class="report-btn-container">
+            <a href="#" class="report-btn" id="reportBtn">Report issues with camera</a>
+        </div>
+        <div class="buttons">
+            <button class="capture-btn" id="enableCameraButton">Enable Camera</button>
+            <button class="next-btn align-right" id="nextButton">Next</button>
+        </div>
+    </div>
+
+    <!-- The Modal -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close">&times;</span>
+                <h2>Report Issue</h2>
+            </div>
+            <div class="modal-body">
+                <form id="reportForm">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" required><br><br>
+                    <label for="note">Description:</label>
+                    <textarea id="note" name="note" rows="4" required></textarea><br><br>
+                    <button type="submit" id="submitReportBtn">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <script>
+        // Get the modal
+        var modal = document.getElementById("myModal");
+
+        // Get the button that opens the modal
+        var btn = document.getElementById("reportBtn");
+
+        // Get the <span> element that closes the modal
+        var span = document.getElementsByClassName("close")[0];
+
+        // When the user clicks the button, open the modal
+        btn.onclick = function () {
+            modal.style.display = "flex";
+        }
+
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function () {
+            modal.style.display = "none";
+        }
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function (event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        var idPreview = document.getElementById('idPreview');
+        var video = document.getElementById('videoPreview');
+        var capturedImage = null; // Variable to hold captured image data
+
+        // Capture photo functionality
+        var enableCameraButton = document.getElementById('enableCameraButton');
+        var captureImageButton = document.getElementById('captureImageButton');
+        var canvas = document.createElement('canvas');
+        var context = canvas.getContext('2d');
+
+        enableCameraButton.addEventListener('click', async () => {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+                enableCameraButton.style.display = 'none';
+                video.style.display = 'block';
+                captureImageButton.style.display = 'inline-block';
+            } catch (err) {
+                console.error('Error accessing the camera: ', err);
+            }
+        });
+
+        captureImageButton.addEventListener('click', () => {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            capturedImage = canvas.toDataURL('image/jpeg');
+            idPreview.src = capturedImage;
+            video.style.display = 'none';
+            captureImageButton.style.display = 'none';
+            enableCameraButton.style.display = 'inline-block';
+            document.getElementById('nextButton').style.display = 'block';
+        });
+
+        // Refresh functionality
+        var refreshButton = document.getElementById('refreshImage');
+        refreshButton.addEventListener('click', () => {
+            idPreview.src = '/static/assets/img/uploadPhoto.jpg';
+            capturedImage = null;
+            video.style.display = 'none';
+            captureImageButton.style.display = 'none';
+            enableCameraButton.style.display = 'inline-block';
+            document.getElementById('nextButton').style.display = 'none';
+        });
+
+        // Form submission handling
+        $('#reportForm').on('submit', function (event) {
+            event.preventDefault();
+            // Implement form submission logic here (e.g., send data to server)
+            alert('Report submitted.'); // Placeholder alert
+            modal.style.display = "none"; // Close the modal after submission
+        });
+    </script>
+</body>
+
+</html>
