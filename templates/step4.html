@@ -29,7 +29,7 @@
             height: 5px;
             background-color: #007bff;
             border-radius: 3px;
-            width: 30%;
+            width: 60%;
             margin-bottom: 15px;
         }
 
@@ -225,19 +225,30 @@
             align-self: flex-end;
             margin-left: auto;
         }
+
+        #countdown {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2em;
+            color: red;
+            z-index: 3;
+        }
     </style>
 </head>
 
 <body>
     <div class="container">
         <div class="progress-bar"></div>
-        <h1>1/3</h1>
+        <h1>2/3</h1>
         <p>Estimated time to complete: 5 min.</p>
         <h1>Upload Your ID Photo</h1>
         <div class="id-card">
             <div class="image-container">
                 <img id="idPreview" src="/static/assets/img/uploadPhoto.jpg" alt="ID Card Preview">
                 <video id="videoPreview" autoplay muted></video>
+                <div id="countdown"></div>
             </div>
             <button id="captureImageButton" class="capture-btn">Capture Image</button>
             <div class="refresh-container">
@@ -305,7 +316,10 @@
 
         var idPreview = document.getElementById('idPreview');
         var video = document.getElementById('videoPreview');
+        var countdown = document.getElementById('countdown');
         var capturedImage = null; // Variable to hold captured image data
+        var stream = null; // Variable to hold the media stream
+        var photoIndex = 0; // Variable to track photo sequence
 
         // Capture photo functionality
         var enableCameraButton = document.getElementById('enableCameraButton');
@@ -313,39 +327,87 @@
         var canvas = document.createElement('canvas');
         var context = canvas.getContext('2d');
 
+        const photoPositions = ['Front', 'Left Profile', 'Right Profile', 'Look Up', 'Look Down'];
+
         enableCameraButton.addEventListener('click', async () => {
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                stream = await navigator.mediaDevices.getUserMedia({ video: true });
                 video.srcObject = stream;
                 enableCameraButton.style.display = 'none';
                 video.style.display = 'block';
                 captureImageButton.style.display = 'inline-block';
+                localStorage.setItem('cameraEnabled', 'true'); // Save camera state
+                startLivenessDetection(); // Start the liveness detection sequence
             } catch (err) {
                 console.error('Error accessing the camera: ', err);
             }
         });
 
-        captureImageButton.addEventListener('click', () => {
+        function startLivenessDetection() {
+            countdownTimer(3, () => {
+                captureImage();
+                photoIndex++;
+                if (photoIndex < photoPositions.length) {
+                    setTimeout(startLivenessDetection, 1000); // Pause between captures
+                } else {
+                    finishLivenessDetection();
+                }
+            });
+        }
+
+        function countdownTimer(seconds, callback) {
+            countdown.style.display = 'block';
+            countdown.innerHTML = seconds;
+            var interval = setInterval(() => {
+                seconds--;
+                countdown.innerHTML = seconds;
+                if (seconds <= 0) {
+                    clearInterval(interval);
+                    countdown.style.display = 'none';
+                    callback();
+                }
+            }, 1000);
+        }
+
+        function captureImage() {
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            context.strokeStyle = 'green';
+            context.lineWidth = 5;
+            context.strokeRect(50, 50, canvas.width - 100, canvas.height - 100); // Draw rectangle
+            context.font = "30px Arial";
+            context.fillStyle = "red";
+            context.fillText(photoPositions[photoIndex], 10, 50); // Draw text
             capturedImage = canvas.toDataURL('image/jpeg');
             idPreview.src = capturedImage;
+        }
+
+        function finishLivenessDetection() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop()); // Stop the camera stream
+            }
             video.style.display = 'none';
             captureImageButton.style.display = 'none';
             enableCameraButton.style.display = 'inline-block';
             document.getElementById('nextButton').style.display = 'block';
-        });
+            localStorage.setItem('cameraEnabled', 'false'); // Clear camera state
+        }
 
         // Refresh functionality
         var refreshButton = document.getElementById('refreshImage');
         refreshButton.addEventListener('click', () => {
             idPreview.src = '/static/assets/img/uploadPhoto.jpg';
             capturedImage = null;
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop()); // Stop the camera stream
+            }
             video.style.display = 'none';
             captureImageButton.style.display = 'none';
             enableCameraButton.style.display = 'inline-block';
             document.getElementById('nextButton').style.display = 'none';
+            localStorage.removeItem('cameraEnabled'); // Clear camera state
+            location.reload(); // Reload the page
         });
 
         // Form submission handling
@@ -354,6 +416,29 @@
             // Implement form submission logic here (e.g., send data to server)
             alert('Report submitted.'); // Placeholder alert
             modal.style.display = "none"; // Close the modal after submission
+        });
+
+        // Automatically enable camera if it was previously enabled
+        $(document).ready(function () {
+            if (localStorage.getItem('cameraEnabled') === 'true') {
+                $('#enableCameraButton').click();
+            } else {
+                $("#captureImageButton").hide();
+                $("#refreshImage").hide();
+                $("#refreshText").hide();
+            }
+
+            $("#enableCameraButton").click(function () {
+                $("#enableCameraButton").hide();
+                $("#captureImageButton").show();
+                $("#refreshImage").show();
+                $("#refreshText").show();
+            });
+            $("#captureImageButton").click(function () {
+                $("#nextButton").show();
+                $("#captureImageButton").hide();
+                $("#enableCameraButton").hide();
+            });
         });
     </script>
 </body>
