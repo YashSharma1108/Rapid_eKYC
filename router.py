@@ -1,19 +1,9 @@
 from flask import Flask, request, render_template, jsonify
-import dbController as db
-import base64
-import pyodbc
+import dbController as repo
 
 app = Flask(__name__)
 
 # Function to connect to the SQL Server database using Windows authentication
-def get_db_connection():
-    conn = pyodbc.connect(
-        'DRIVER={ODBC Driver 17 for SQL Server};'
-        'SERVER=INVL0077;'
-        'DATABASE=RapidKyc;'
-        'Trusted_Connection=yes;'
-    )
-    return conn
 
 @app.route("/", methods=['GET'])
 def index():
@@ -45,16 +35,15 @@ def step4():
 
 @app.route("/fetchData", methods=['POST'])
 def fetchData():
-    try:
+    # try:
         captured_image = request.form['capturedImage']
         # Decode the base64 image data
-        image_data = base64.b64decode(captured_image.split(",")[1])
 
-        userinfo = db.fetchData(image_data)
+        userinfo = repo.fetchData(captured_image)
         return jsonify({"message": "Image processed successfully", "userinfo": userinfo}), 200
-    except Exception as e:
-        print(f"Error processing image: {e}")
-        return jsonify({"error": "Internal Server Error"}), 500
+    # except Exception as e:
+    #     print(f"Error processing image: {e}")
+    #     return jsonify({"error": "Internal Server Error"}), 500
 
 @app.route("/verifyFace", methods=['GET'])
 def verifyFace():
@@ -62,7 +51,7 @@ def verifyFace():
         image = request.files['userImage']
         data = image.stream.read()
         # Assuming face1 and face2 are correctly defined and used in db.compareFace
-        return db.compareFace(face1, face2)
+        return repo.compareFace(data)
     except Exception as e:
         print(f"Error verifying face: {e}")
         return jsonify({"error": "Internal Server Error"}), 500
@@ -73,13 +62,8 @@ def add_report():
         username = request.form['username']
         note = request.form['note']
 
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("INSERT INTO report (username, note) VALUES (?, ?)", (username, note))
-        conn.commit()
-        cursor.close()
-        conn.close()
-
+        repo.addReport(username, note)
+        
         return jsonify({"message": "Report submitted successfully"}), 200
     except Exception as e:
         print(f"Error submitting report: {e}")
