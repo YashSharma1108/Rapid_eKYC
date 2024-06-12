@@ -102,13 +102,13 @@ CREATE TABLE UserUpload (
 
 select * from UserDetails
 
-CREATE TABLE UserDetails (
-    Name NVARCHAR(255)  NULL,
-    DateOfBirth NVARCHAR(20),
-    Gender NVARCHAR(20),
-    AadharNumber NVARCHAR(20) UNIQUE,
-    InsertedAt DATETIME DEFAULT GETDATE()
-);
+--CREATE TABLE UserDetails (
+--    Name NVARCHAR(255)  NULL,
+--    DateOfBirth NVARCHAR(20),
+--    Gender NVARCHAR(20),
+--    AadharNumber NVARCHAR(20) UNIQUE,
+--    InsertedAt DATETIME DEFAULT GETDATE()
+--);
 
 
 
