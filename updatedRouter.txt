@@ -38,6 +38,10 @@ safety_settings = {
 def index():
     return render_template('index.html')
 
+@app.route("/login", methods=['GET'])
+def login():
+    return render_template('login.html')
+
 @app.route("/box", methods=['GET'])
 def box():
     return render_template('box.html')
@@ -57,6 +61,37 @@ def sample():
 @app.route("/step4", methods=['GET'])
 def step4():
     return render_template('step4.html')
+
+@app.route("/signup", methods=['GET', 'POST'])
+def signup():
+    if request.method == 'POST':
+        try:
+            fullname = request.form['fullname']
+            email = request.form['email']
+            password = request.form['password']
+            repeat_password = request.form['repeatpass']
+
+            # Basic validation
+            if password != repeat_password:
+                return "Passwords do not match!", 400
+
+            # Insert into database
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT INTO Users (FullName, Email, Password)
+                VALUES (?, ?, ?)
+            """, (fullname, email, password))
+            conn.commit()
+            cursor.close()
+            conn.close()
+
+            return render_template('index.html')  # Render index.html after successful insertion
+
+        except KeyError as e:
+            return f"Missing form field: {str(e)}", 400
+
+    return render_template('login.html')
 
 @app.route("/report/addreport", methods=['POST'])
 def add_report():
