@@ -432,6 +432,8 @@
                 success: function (response) {
                     console.log('Image sent successfully!');
                     // Handle success response if needed
+                    // Redirect to the final.html page
+                    window.location.href = '/final';
                 },
                 error: function (error) {
                     console.error('Error sending image:', error);
